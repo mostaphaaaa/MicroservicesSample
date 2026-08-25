@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Docker Compose/">
+    <File Path="compose.yml" />
+  </Folder>
+  <Project Path="ApiGateway/ApiGateway.csproj" Id="363ed211-141f-4bf6-ac5c-9ddd829b7cf9" />
+  <Project Path="NotificationService/NotificationService.csproj" Id="7774a6b2-0511-47c0-986b-b3ab9439797e" />
+  <Project Path="OrderService/OrderService.csproj" Id="79c96192-9061-4541-b283-b98050e2a08f" />
+  <Project Path="ProductService/ProductService.csproj" />
+  <Project Path="UserService/UserService.csproj" Id="1b579b2f-4894-4e6f-8d2c-c4f69faefea8" />
+</Solution>

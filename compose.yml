@@ -1,0 +1,126 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq-compose
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8
+    container_name: redis-compose
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: sqlserver-compose
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${SQL_PASSWORD}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q \"SELECT 1\" || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+
+  productservice:
+    build:
+      context: ./ProductService
+    container_name: productservice
+    ports:
+      - "7189:8080"
+    environment:
+      ConnectionStrings__ProductDb: "Server=sqlserver,1433;Database=MiniShop_ProductDb;User Id=sa;Password=${SQL_PASSWORD};TrustServerCertificate=True"
+      Redis__ConnectionString: "${REDIS_HOST}:${REDIS_PORT}"
+      RabbitMQ__Host: "${RABBITMQ_HOST}"
+      RabbitMQ__Port: "${RABBITMQ_PORT}"
+      RabbitMQ__UserName: "${RABBITMQ_USERNAME}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+
+  orderservice:
+    build:
+      context: ./OrderService
+    container_name: orderservice
+    ports:
+      - "7070:8080"
+    environment:
+      ConnectionStrings__OrderDb: "Server=sqlserver,1433;Database=MiniShop_OrderDb;User Id=sa;Password=${SQL_PASSWORD};TrustServerCertificate=True"
+      ProductService__BaseUrl: "http://${PRODUCT_SERVICE_HOST}:${PRODUCT_SERVICE_PORT}"
+      RabbitMQ__Host: "${RABBITMQ_HOST}"
+      RabbitMQ__Port: "${RABBITMQ_PORT}"
+      RabbitMQ__UserName: "${RABBITMQ_USERNAME}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+      productservice:
+        condition: service_started
+
+  notificationservice:
+    build:
+      context: ./NotificationService
+    container_name: notificationservice
+    environment:
+      RabbitMQ__Host: "${RABBITMQ_HOST}"
+      RabbitMQ__Port: "${RABBITMQ_PORT}"
+      RabbitMQ__UserName: "${RABBITMQ_USERNAME}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+
+  apigateway:
+    build:
+      context: ./ApiGateway
+    container_name: apigateway
+    ports:
+      - "7103:8080"
+    environment:
+      ReverseProxy__Clusters__product-cluster__Destinations__product-service__Address: "http://productservice:8080/"
+      ReverseProxy__Clusters__order-cluster__Destinations__order-service__Address: "http://orderservice:8080/"
+    depends_on:
+      productservice:
+        condition: service_started
+      orderservice:
+        condition: service_started
+
+volumes:
+  rabbitmq_data:
+  redis_data:
+  sqlserver_data:
