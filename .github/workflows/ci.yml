@@ -51,5 +51,12 @@ jobs:
           docker tag microservicessample-notificationservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-notificationservice:latest
           docker tag microservicessample-apigateway:latest ghcr.io/${{ github.repository_owner }}/microservicessample-apigateway:latest
 
+      - name: Push Docker images
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/microservicessample-productservice:latest
+          docker push ghcr.io/${{ github.repository_owner }}/microservicessample-orderservice:latest
+          docker push ghcr.io/${{ github.repository_owner }}/microservicessample-notificationservice:latest
+          docker push ghcr.io/${{ github.repository_owner }}/microservicessample-apigateway:latest
+
 
 
