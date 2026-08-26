@@ -40,3 +40,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag Docker images
+        run: |
+          docker tag minishop-productservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-productservice:latest
+          docker tag minishop-orderservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-orderservice:latest
+          docker tag minishop-notificationservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-notificationservice:latest
+          docker tag minishop-apigateway:latest ghcr.io/${{ github.repository_owner }}/microservicessample-apigateway:latest
