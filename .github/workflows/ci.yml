@@ -46,7 +46,10 @@ jobs:
 
       - name: Tag Docker images
         run: |
-          docker tag minishop-productservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-productservice:latest
-          docker tag minishop-orderservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-orderservice:latest
-          docker tag minishop-notificationservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-notificationservice:latest
-          docker tag minishop-apigateway:latest ghcr.io/${{ github.repository_owner }}/microservicessample-apigateway:latest
+          docker tag microservicessample-productservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-productservice:latest
+          docker tag microservicessample-orderservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-orderservice:latest
+          docker tag microservicessample-notificationservice:latest ghcr.io/${{ github.repository_owner }}/microservicessample-notificationservice:latest
+          docker tag microservicessample-apigateway:latest ghcr.io/${{ github.repository_owner }}/microservicessample-apigateway:latest
+
+
+
