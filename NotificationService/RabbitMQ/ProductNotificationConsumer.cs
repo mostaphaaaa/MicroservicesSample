@@ -36,6 +36,18 @@ namespace NotificationService.RabbitMQ
                 autoDelete: false,
                 arguments: null,
                 cancellationToken: stoppingToken);
+	   await _channel.ExchangeDeclareAsync(
+   	        exchange: "product.exchange",
+   	        type: ExchangeType.Direct,
+   	        durable: true,
+   	        autoDelete: false,
+   	        cancellationToken: stoppingToken);
+
+	  await _channel.QueueBindAsync(
+   	        queue: "product.queue",
+   	        exchange: "product.exchange",
+   	        routingKey: "product.created",
+   	        cancellationToken: stoppingToken);
 
             var consumer = new AsyncEventingBasicConsumer(_channel);
 
