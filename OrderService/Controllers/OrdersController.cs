@@ -108,5 +108,19 @@ namespace OrderService.Controllers
 
             return CreatedAtAction(nameof(GetAll),new {id=order.Id});
         }
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var order =await  _context.Orders
+                .SingleOrDefaultAsync(o => o.Id==id);
+            if (order == null)
+                return NotFound();
+            _context.Orders.Remove(order);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
