@@ -52,6 +52,16 @@ jobs:
 
 
       - name: Deploy
+        env:
+          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
+          RABBITMQ_PASSWORD: ${{ secrets.RABBITMQ_PASSWORD }}
+          RABBITMQ_HOST: rabbitmq
+          RABBITMQ_PORT: 5672
+          RABBITMQ_USERNAME: guest
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
+          PRODUCT_SERVICE_HOST: productservice
+          PRODUCT_SERVICE_PORT: 8080
         run: |
           docker compose -f compose.prod.yml pull
           docker compose -f compose.prod.yml up -d
