@@ -14,3 +14,7 @@
 
 # UserService
 UserService/
+
+
+actions-runner/
+compose.prod.yml.save
