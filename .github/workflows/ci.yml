@@ -51,4 +51,7 @@ jobs:
           docker push ghcr.io/${{ github.repository_owner }}/microservicessample-apigateway:latest
 
 
-
+      - name: Deploy
+        run: |
+          docker compose -f compose.prod.yml pull
+          docker compose -f compose.prod.yml up -d
