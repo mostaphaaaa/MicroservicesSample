@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: productservice-migration
+  namespace: microservices
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+
+      imagePullSecrets:
+        - name: ghcr-secret
+
+      containers:
+        - name: migration
+          image: ghcr.io/mostaphaaaa/microservicessample-productservice-migration:latest
+
+          args:
+            - database
+            - update
+
+          env:
+            - name: ConnectionStrings__ProductDb
+              valueFrom:
+                secretKeyRef:
+                  name: productservice-secret
+                  key: ProductDb

@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: orderservice-migration
+  namespace: microservices
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+
+      imagePullSecrets:
+        - name: ghcr-secret
+
+      containers:
+        - name: migration
+          image: ghcr.io/mostaphaaaa/microservicessample-orderservice-migration:latest
+          args:
+            - database
+            - update
+
+          env:
+            - name: ConnectionStrings__OrderDb
+              valueFrom:
+                secretKeyRef:
+                  name: orderservice-secret
+                  key: OrderDb

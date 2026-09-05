@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apigateway
+  namespace: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apigateway
+  template:
+    metadata:
+      labels:
+        app: apigateway
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+
+      containers:
+        - name: apigateway
+          image: ghcr.io/mostaphaaaa/microservicessample-apigateway:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+
+          env:
+            - name: ReverseProxy__Clusters__product-cluster__Destinations__product-service__Address
+              value: "http://productservice:8080/"
+
+            - name: ReverseProxy__Clusters__order-cluster__Destinations__order-service__Address
+              value: "http://orderservice:8080/"

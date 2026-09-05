@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderservice
+  namespace: microservices
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orderservice
+  template:
+    metadata:
+      labels:
+        app: orderservice
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: orderservice
+          image: ghcr.io/mostaphaaaa/microservicessample-orderservice:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ConnectionStrings__OrderDb
+              valueFrom:
+                secretKeyRef:
+                  name: orderservice-secret
+                  key: OrderDb
+
+            - name: ProductService__BaseUrl
+              value: "http://productservice:8080"
+
+            - name: RabbitMQ__Host
+              value: "rabbitmq"
+
+            - name: RabbitMQ__Port
+              value: "5672"
+
+            - name: RabbitMQ__UserName
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_DEFAULT_USER
+
+            - name: RabbitMQ__Password
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_DEFAULT_PASS

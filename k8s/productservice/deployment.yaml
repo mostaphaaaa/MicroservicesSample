@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: productservice
+  namespace: microservices
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: productservice
+
+  template:
+    metadata:
+      labels:
+        app: productservice
+
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+
+      containers:
+        - name: productservice
+          image: ghcr.io/mostaphaaaa/microservicessample-productservice:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+
+          env:
+            - name: ConnectionStrings__ProductDb
+              valueFrom:
+                secretKeyRef:
+                  name: productservice-secret
+                  key: ProductDb
+
+            - name: Redis__ConnectionString
+              value: "redis:6379"
+
+            - name: RabbitMQ__Host
+              value: "rabbitmq"
+
+            - name: RabbitMQ__Port
+              value: "5672"
+
+            - name: RabbitMQ__UserName
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_DEFAULT_USER
+
+            - name: RabbitMQ__Password
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_DEFAULT_PASS

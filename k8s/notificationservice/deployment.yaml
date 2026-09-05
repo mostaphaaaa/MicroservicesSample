@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notificationservice
+  namespace: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notificationservice
+  template:
+    metadata:
+      labels:
+        app: notificationservice
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: notificationservice
+          image: ghcr.io/mostaphaaaa/microservicessample-notificationservice:latest
+          imagePullPolicy: Always
+          env:
+            - name: RabbitMQ__Host
+              value: "rabbitmq"
+
+            - name: RabbitMQ__Port
+              value: "5672"
+
+            - name: RabbitMQ__UserName
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_DEFAULT_USER
+
+            - name: RabbitMQ__Password
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret
+                  key: RABBITMQ_DEFAULT_PASS
